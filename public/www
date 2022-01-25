@@ -1,0 +1,71 @@
+#!/usr/bin/env node
+
+
+const app = require('../server');
+const http = require('http');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Server Connection
+    |--------------------------------------------------------------------------
+    | We create a development server using the native HTTP module
+    | by NODE
+    */
+
+let port = runningPort(process.env.PORT || '3000');
+
+app.set('port', port);
+
+
+
+let server = http.createServer(app);
+server.listen(port);
+server.on('listening', onListening);
+server.on('error', onError);
+
+function runningPort(value) {
+    let port = parseInt(value, 10);
+
+    if (isNaN(port)){
+        return value;
+    }
+    if (port >= 0){
+        return port;
+    }
+
+    return false;
+    
+}
+
+function onListening(){
+    let addr = server.address();
+    let bind = typeof addr === 'string'
+      ? addr
+      : addr.port;
+    console.log('Development Server started on '+"http://"+ process.env.SERVER_ADDRESS+ ":" + bind);
+}
+
+function onError(error){
+    if (error.syscall !== 'listen') {
+        throw error;
+      }
+    
+      var bind = typeof port === 'string'
+        ? 'Pipe ' + port
+        : 'Port ' + port;
+    
+      // handle specific listen errors with friendly messages
+      switch (error.code) {
+        case 'EACCES':
+          console.error(bind + ' requires elevated privileges');
+          process.exit(1);
+          break;
+        case 'EADDRINUSE':
+          console.error(bind + ' is already in use');
+          process.exit(1);
+          break;
+        default:
+          throw error;
+      }
+}
